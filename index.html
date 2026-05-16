@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peach Tree Cost Summary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1F1F1E;
+      --ink-soft: #3A3A38;
+      --muted: #6B6B68;
+      --rule: #D6CFC0;
+      --bg: #FFFFFF;
+      --bg-panel: #FAF7F0;
+      --sage: #4E7A4A;
+      --burnt: #B5563A;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 12pt;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sheet {
+      max-width: 7.5in;
+      margin: 0 auto;
+      padding: 0.5in 0.5in 0.5in 0.5in;
+    }
+
+    .header {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+    .title {
+      font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+      font-size: 26pt;
+      font-weight: 600;
+      line-height: 1.15;
+      margin: 0 0 8px;
+      color: var(--ink);
+    }
+    .subtitle {
+      font-size: 11pt;
+      color: var(--muted);
+      font-style: italic;
+      margin: 0;
+    }
+
+    .status-note {
+      background: var(--bg-panel);
+      border-left: 3px solid var(--burnt);
+      padding: 10px 14px;
+      margin: 0 0 24px;
+      font-size: 11pt;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+    .status-note .status-label {
+      display: block;
+      font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 8.5pt;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--burnt);
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    section {
+      margin-bottom: 22px;
+      page-break-inside: avoid;
+    }
+    section.tight { margin-bottom: 18px; }
+
+    h2 {
+      font-size: 10.5pt;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 0 0 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 3px 0;
+      gap: 16px;
+    }
+    .row .label { color: var(--ink-soft); }
+    .row .value {
+      font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .row.total {
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px solid var(--rule);
+    }
+    .row.total .label,
+    .row.total .value {
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .row .wip-tag {
+      display: inline-block;
+      font-family: ui-monospace, monospace;
+      font-size: 8pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--burnt);
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    .metric {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 8px 0;
+    }
+    .metric .num {
+      font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 22pt;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .metric .num.headline { color: var(--sage); }
+    .metric .desc {
+      font-size: 11pt;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .formula {
+      font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 10pt;
+      color: var(--muted);
+      margin-top: 4px;
+      padding-left: 0;
+    }
+
+    ul.notes {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.notes li {
+      padding: 6px 0 6px 14px;
+      position: relative;
+      font-size: 11pt;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+    ul.notes li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      width: 6px;
+      height: 1px;
+      background: var(--burnt);
+    }
+    ul.notes li .tag {
+      display: inline-block;
+      font-family: ui-monospace, monospace;
+      font-size: 8.5pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--burnt);
+      margin-right: 8px;
+    }
+
+    .footer {
+      margin-top: 28px;
+      padding-top: 12px;
+      border-top: 1px solid var(--rule);
+      font-size: 9.5pt;
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* Print Rule — White Paper Only (system-wide).
+       Screen mode keeps semantic color emphasis (sage / burnt-orange).
+       Print mode collapses all color emphasis to dark gray; emphasis comes
+       from weight + size + dividers + bracketed tags. */
+    @media print {
+      html, body {
+        background: #FFFFFF !important;
+        color: #1F1F1E !important;
+      }
+      .sheet { padding: 0; max-width: 100%; }
+      section { page-break-inside: avoid; }
+
+      .title,
+      .row .value,
+      .row .label,
+      .metric .num,
+      .metric .num.headline,
+      .metric .desc,
+      ul.notes li,
+      ul.notes li .tag,
+      .formula,
+      h2,
+      .subtitle,
+      .footer,
+      .status-note,
+      .status-note .status-label,
+      .row .wip-tag {
+        color: #1F1F1E !important;
+        background: transparent !important;
+      }
+
+      .metric .num.headline {
+        color: #1F1F1E !important;
+        font-weight: 800;
+      }
+
+      ul.notes li .tag,
+      .status-note .status-label,
+      .row .wip-tag {
+        color: #3A3A38 !important;
+        font-weight: 700;
+      }
+      ul.notes li .tag::before { content: '['; }
+      ul.notes li .tag::after  { content: ']'; }
+      .row .wip-tag::before { content: '['; }
+      .row .wip-tag::after  { content: ']'; }
+
+      ul.notes li::before {
+        background: #6B6B68 !important;
+      }
+
+      .row .label,
+      .metric .desc,
+      .subtitle,
+      .formula,
+      .footer {
+        color: #3A3A38 !important;
+      }
+
+      .header { border-bottom: 1px solid #1F1F1E !important; }
+      h2 { border-bottom: 1px solid #B5AFA0 !important; }
+      .footer { border-top: 1px solid #B5AFA0 !important; }
+      .status-note {
+        border: 1px solid #B5AFA0 !important;
+        border-left: 3px solid #1F1F1E !important;
+        padding: 8px 12px !important;
+      }
+    }
+    @page {
+      size: letter portrait;
+      margin: 0.5in;
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+
+    <header class="header">
+      <h1 class="title">Peach Tree Cost Summary</h1>
+      <p class="subtitle">Working model for Mike / Dan / Kelly review</p>
+    </header>
+
+    <div class="status-note">
+      <span class="status-label">Status</span>
+      PTN numbers are the current working model. PTS is still work in progress and should not be treated as final.
+    </div>
+
+    <section class="tight">
+      <h2>Project Lots</h2>
+      <div class="row"><span class="label">Peach Tree North (PTN)</span><span class="value">35 lots</span></div>
+      <div class="row"><span class="label">Peach Tree South (PTS)<span class="wip-tag">WIP</span></span><span class="value">81 lots</span></div>
+      <div class="row total"><span class="label">Total</span><span class="value">116 lots</span></div>
+    </section>
+
+    <section>
+      <h2>PTN Development Cost — Line Items</h2>
+      <div class="row"><span class="label">Pegram contract</span><span class="value">$1,369,785</span></div>
+      <div class="row"><span class="label">Power — PTN</span><span class="value">$184,000</span></div>
+      <div class="row"><span class="label">Staking / survey</span><span class="value">$35,000</span></div>
+      <div class="row"><span class="label">Building permit</span><span class="value">$10,000</span></div>
+      <div class="row"><span class="label">Phase 3 power</span><span class="value">$106,000</span></div>
+      <div class="row"><span class="label">Mitigation fee / road extension</span><span class="value">$50,000</span></div>
+      <div class="row total"><span class="label">Total PTN development cost</span><span class="value">$1,754,785</span></div>
+    </section>
+
+    <section>
+      <h2>PTN Cost Per Lot</h2>
+      <div class="metric">
+        <span class="num">$50,136.71 / lot</span>
+        <span class="desc">Gross PTN cost per lot, before applying shared benefit</span>
+      </div>
+      <div class="formula">$1,754,785 ÷ 35 lots = $50,136.71 / lot</div>
+    </section>
+
+    <section>
+      <h2>Shared Infrastructure — Line Items</h2>
+      <div class="row"><span class="label">Lift station</span><span class="value">$206,000</span></div>
+      <div class="row"><span class="label">Road extension fee</span><span class="value">$50,000</span></div>
+      <div class="row"><span class="label">Shared dry power</span><span class="value">$106,000</span></div>
+      <div class="row total"><span class="label">Shared total</span><span class="value">$362,000</span></div>
+    </section>
+
+    <section>
+      <h2>Shared Benefit Distribution</h2>
+      <div class="metric">
+        <span class="num">$3,120.69 / lot</span>
+        <span class="desc">Shared benefit distributed across all 116 lots</span>
+      </div>
+      <div class="formula">$362,000 ÷ 116 lots = $3,120.69 / lot</div>
+
+      <div class="row" style="margin-top:10px"><span class="label">PTN benefit (35 lots)</span><span class="value">$109,224.14</span></div>
+      <div class="row"><span class="label">PTS benefit (81 lots)<span class="wip-tag">WIP — depends on PTS</span></span><span class="value">$252,775.86</span></div>
+    </section>
+
+    <section>
+      <h2>Net PTN Burden</h2>
+      <div class="metric">
+        <span class="num headline">$47,016.02 / lot</span>
+        <span class="desc">Net PTN cost per lot after applying shared benefit</span>
+      </div>
+      <div class="formula">$50,136.71 − $3,120.69 = $47,016.02 / lot</div>
+    </section>
+
+    <section>
+      <h2>Key Notes</h2>
+      <ul class="notes">
+        <li><span class="tag">Working</span> PTN figures above are the current working model. Source values reconciled against the Google Sheet on 2026-05-13.</li>
+        <li><span class="tag">WIP</span> PTS is still work in progress. The 81-lot count and the PTS benefit share are placeholders that will move as the PTS model is finalized.</li>
+        <li><span class="tag">Derived</span> Per-lot benefit ($3,120.69) and the PTN / PTS shares are calculated from the shared total ($362,000). They shift if any shared line item changes.</li>
+        <li><span class="tag">Unmodeled</span> Carrying cost (interest + taxes on PTN inventory during build) is not yet in this summary.</li>
+      </ul>
+    </section>
+
+    <footer class="footer">
+      Working model · For Mike / Dan / Kelly review · Numbers subject to revision
+    </footer>
+
+  </div>
+</body>
+</html>
